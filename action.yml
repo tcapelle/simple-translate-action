@@ -1,23 +1,26 @@
-name: 'Hello World'
-description: 'Greet someone'
+name: 'Translate'
+description: 'Automatic translation using GPT'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  folder-to-translate:  # id of input
+    description: 'Path to folder to translate'
     required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+    default: 'docs/'
+  language:  # id of input
+    description: 'Language to translate to'
+    required: true
+    default: 'es'
+  output-folder:
+    description: "Output Folder"
+    default: 'docs_translated/'
+
 runs:
   using: "composite"
   steps:
-    - run: echo Hello ${{ inputs.who-to-greet }}.
+    - run: echo Folder to translate ${{ inputs.folder-to-translate }}.
       shell: bash
-    - id: random-number-generator
-      run: echo "random-number=$(echo $RANDOM)" >> $GITHUB_OUTPUT
+    - run: |
+        python -m pip install --upgrade pip
+        python -m pip install gpt-translate
       shell: bash
-    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
-      shell: bash
-    - run: goodbye.sh
+    - run: gpt_translate.folder ${{ inputs.folder-to-translate }} ${{ inputs.output-folder }} --language ${{ inputs.language }}
       shell: bash
